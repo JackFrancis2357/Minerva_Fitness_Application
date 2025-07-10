@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Daily Workout Planner - Create Your Workout{% endblock %}
+{% block title %}FitnessPro - AI-Powered Workout Generator{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -9,11 +9,16 @@
         <div class="text-center mb-5">
             <h1 class="display-4 mb-3">
                 <i class="bi bi-lightning-charge text-orange"></i>
-                Daily Workout Planner
+                FitnessPro
             </h1>
             <p class="lead text-muted">
-                Create personalized workout plans or AI-powered weekly schedules based on your equipment and goals
+                AI-powered workout and nutrition planning platform
             </p>
+            <div class="mt-3">
+                <span class="badge bg-primary me-2">AI-Powered Weekly Plans</span>
+                <span class="badge bg-success me-2">Progress Tracking</span>
+                <span class="badge bg-warning">Nutrition Planning</span>
+            </div>
         </div>
 
         <!-- Workout Generator Form -->
@@ -221,6 +226,99 @@
                         </p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Premium Features Showcase -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="text-center mb-4">
+            <h2>Unlock Premium Features</h2>
+            <p class="text-muted">Take your fitness journey to the next level with advanced features</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-graph-up h1 text-success"></i>
+                        <h5 class="card-title">Progress Tracking</h5>
+                        <p class="card-text">Monitor your fitness journey with detailed analytics, goal setting, and performance insights.</p>
+                        <a href="{{ url_for('progress_tracker') }}" class="btn btn-success">Try Premium</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-person-gear h1 text-primary"></i>
+                        <h5 class="card-title">Custom Exercises</h5>
+                        <p class="card-text">Create and save your own exercises to personalize your workout routines completely.</p>
+                        <a href="{{ url_for('custom_exercises') }}" class="btn btn-primary">Try Premium</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="bi bi-apple h1 text-warning"></i>
+                        <h5 class="card-title">AI Nutrition Plans</h5>
+                        <p class="card-text">Get personalized nutrition plans powered by AI to complement your fitness goals.</p>
+                        <a href="{{ url_for('nutrition_planner') }}" class="btn btn-warning">Try Pro</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Usage Limits for Free Users -->
+{% if session.get('subscription_tier', 'free') == 'free' %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Free Plan Limits:</strong>
+                    Daily Workouts: {{ session.get('daily_workouts_count', 0) }}/3 • 
+                    Weekly Plans: {{ session.get('weekly_plans_count', 0) }}/1
+                </div>
+                <a href="{{ url_for('pricing') }}" class="btn btn-primary btn-sm">Upgrade Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Pricing Teaser -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body text-center py-5">
+                <h3>Ready to Transform Your Fitness?</h3>
+                <p class="lead">Join thousands of users who've achieved their fitness goals with FitnessPro</p>
+                <div class="row text-center mt-4">
+                    <div class="col-md-4">
+                        <div class="h4">$9.99/mo</div>
+                        <div>Premium Plan</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="h4">$19.99/mo</div>
+                        <div>Pro Plan</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="h4">Free</div>
+                        <div>Basic Plan</div>
+                    </div>
+                </div>
+                <a href="{{ url_for('pricing') }}" class="btn btn-light btn-lg mt-4">
+                    <i class="bi bi-gem"></i> View All Plans
+                </a>
             </div>
         </div>
     </div>

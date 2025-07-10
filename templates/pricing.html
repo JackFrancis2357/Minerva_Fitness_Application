@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Pricing - Fitness Planner{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-5">Choose Your Fitness Plan</h1>
+            <p class="text-center text-muted mb-5">Unlock premium features and take your fitness journey to the next level</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        {% for tier_id, tier in subscription_tiers.items() %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 {% if tier_id == 'premium' %}border-primary{% elif tier_id == 'pro' %}border-success{% endif %}">
+                {% if tier_id == 'premium' %}
+                <div class="card-header bg-primary text-white text-center">
+                    <span class="badge badge-light">Most Popular</span>
+                </div>
+                {% elif tier_id == 'pro' %}
+                <div class="card-header bg-success text-white text-center">
+                    <span class="badge badge-light">Best Value</span>
+                </div>
+                {% endif %}
+                
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ tier.name }}</h3>
+                    <div class="mb-3">
+                        <span class="h2">${{ "%.2f"|format(tier.price) }}</span>
+                        {% if tier.price > 0 %}<span class="text-muted">/month</span>{% endif %}
+                    </div>
+                    
+                    <ul class="list-unstyled mb-4">
+                        {% if tier_id == 'free' %}
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> {{ tier.daily_workouts }} daily workouts</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> {{ tier.weekly_plans }} weekly plan</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> {{ tier.saved_plans }} saved plans</li>
+                        {% else %}
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> {% if tier.daily_workouts == 999 %}Unlimited{% else %}{{ tier.daily_workouts }}{% endif %} daily workouts</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> {% if tier.weekly_plans == 999 %}Unlimited{% else %}{{ tier.weekly_plans }}{% endif %} weekly plans</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> {% if tier.saved_plans == 999 %}Unlimited{% else %}{{ tier.saved_plans }}{% endif %} saved plans</li>
+                        {% endif %}
+                        
+                        {% for feature in tier.features %}
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> {{ feature }}</li>
+                        {% endfor %}
+                    </ul>
+                    
+                    {% if tier_id == 'free' %}
+                    <button class="btn btn-outline-secondary btn-block" disabled>Current Plan</button>
+                    {% else %}
+                    <a href="{{ url_for('subscribe', tier=tier_id) }}" class="btn {% if tier_id == 'premium' %}btn-primary{% else %}btn-success{% endif %} btn-block">
+                        Upgrade to {{ tier.name }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Premium Features Overview</h4>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-graph-up text-primary"></i> Progress Tracking</h6>
+                            <p class="text-muted">Track your workout progress, set goals, and monitor your fitness journey with detailed analytics.</p>
+                            
+                            <h6><i class="bi bi-bookmark-star text-primary"></i> Save Workouts</h6>
+                            <p class="text-muted">Save your favorite workout plans and access them anytime. Build your personal workout library.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-person-gear text-success"></i> Custom Exercises</h6>
+                            <p class="text-muted">Create and add your own exercises to personalize your workout plans completely.</p>
+                            
+                            <h6><i class="bi bi-apple text-success"></i> Nutrition Planning (Pro)</h6>
+                            <p class="text-muted">AI-powered nutrition plans tailored to your fitness goals and dietary preferences.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <h5>Frequently Asked Questions</h5>
+            <div class="accordion mt-3" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq1">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1">
+                            Can I cancel my subscription anytime?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes! You can cancel your subscription at any time. Your premium features will remain active until the end of your current billing period.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2">
+                            What's the difference between Premium and Pro?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Premium includes unlimited workouts, progress tracking, and custom exercises. Pro adds AI-powered nutrition planning, advanced analytics, and priority support.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq3">
+                        <button class="accordion-button collapsed" type="button" data-bs-target="#faqCollapse3">
+                            Is my data secure?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Absolutely! We use industry-standard encryption and security measures to protect your personal information and workout data.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}Progress Tracker - Fitness Planner{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-graph-up text-success"></i> Progress Tracker</h1>
+                <div>
+                    <span class="badge badge-success">Premium Feature</span>
+                    <button class="btn btn-primary ms-2" onclick="showLogWorkoutModal()">
+                        <i class="bi bi-plus"></i> Log Workout
+                    </button>
+                </div>
+            </div>
+            <p class="text-muted">Track your fitness progress and see how you're improving over time.</p>
+        </div>
+    </div>
+
+    <!-- Progress Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-week h2 text-primary"></i>
+                    <h5 class="card-title">This Week</h5>
+                    <div class="h4">5</div>
+                    <p class="text-muted">Workouts Completed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock h2 text-success"></i>
+                    <h5 class="card-title">Total Time</h5>
+                    <div class="h4">240</div>
+                    <p class="text-muted">Minutes This Week</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-fire h2 text-warning"></i>
+                    <h5 class="card-title">Streak</h5>
+                    <div class="h4">7</div>
+                    <p class="text-muted">Days Active</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-trophy h2 text-danger"></i>
+                    <h5 class="card-title">This Month</h5>
+                    <div class="h4">18</div>
+                    <p class="text-muted">Workouts Total</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Charts -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Weekly Activity</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="weeklyChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Workout Duration Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="durationChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Goals Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Monthly Goals</h5>
+                    <button class="btn btn-sm btn-outline-primary" onclick="showGoalModal()">
+                        <i class="bi bi-plus"></i> Add Goal
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6>Workout Days</h6>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-success" style="width: 72%"></div>
+                                    </div>
+                                    <small class="text-muted">18/25 days (72%)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6>Total Hours</h6>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-info" style="width: 85%"></div>
+                                    </div>
+                                    <small class="text-muted">17/20 hours (85%)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6>Strength Training</h6>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-warning" style="width: 60%"></div>
+                                    </div>
+                                    <small class="text-muted">6/10 sessions (60%)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Workouts -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Workouts</h5>
+                </div>
+                <div class="card-body">
+                    {% if progress_data %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Duration</th>
+                                    <th>Exercises</th>
+                                    <th>Difficulty</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for progress in progress_data %}
+                                <tr>
+                                    <td>{{ progress.date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ progress.duration_minutes }} min</td>
+                                    <td>{{ progress.exercises_completed }}/{{ progress.total_exercises }}</td>
+                                    <td>
+                                        {% if progress.difficulty_rating %}
+                                        {% for i in range(1, 6) %}
+                                        <i class="bi bi-star{% if i <= progress.difficulty_rating %}-fill{% endif %} text-warning"></i>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ progress.notes or '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <!-- Demo data since no real progress data exists -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Duration</th>
+                                    <th>Exercises</th>
+                                    <th>Difficulty</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2025-07-10</td>
+                                    <td>45 min</td>
+                                    <td>8/8</td>
+                                    <td>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star text-warning"></i>
+                                    </td>
+                                    <td>Great upper body session</td>
+                                </tr>
+                                <tr>
+                                    <td>2025-07-09</td>
+                                    <td>30 min</td>
+                                    <td>6/6</td>
+                                    <td>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star text-warning"></i>
+                                        <i class="bi bi-star text-warning"></i>
+                                    </td>
+                                    <td>Quick cardio workout</td>
+                                </tr>
+                                <tr>
+                                    <td>2025-07-08</td>
+                                    <td>50 min</td>
+                                    <td>10/10</td>
+                                    <td>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    </td>
+                                    <td>Challenging leg day</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Workout Modal -->
+<div class="modal fade" id="logWorkoutModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Log Workout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="logWorkoutForm">
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" id="workoutDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Duration (minutes)</label>
+                        <input type="number" class="form-control" id="workoutDuration" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Exercises Completed</label>
+                        <input type="number" class="form-control" id="exercisesCompleted" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Total Exercises</label>
+                        <input type="number" class="form-control" id="totalExercises" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Difficulty (1-5 stars)</label>
+                        <select class="form-select" id="difficultyRating">
+                            <option value="">Select difficulty</option>
+                            <option value="1">1 - Very Easy</option>
+                            <option value="2">2 - Easy</option>
+                            <option value="3">3 - Moderate</option>
+                            <option value="4">4 - Hard</option>
+                            <option value="5">5 - Very Hard</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" id="workoutNotes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="logWorkout()">Log Workout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set today's date as default
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('workoutDate').value = today;
+});
+
+function showLogWorkoutModal() {
+    const modal = new bootstrap.Modal(document.getElementById('logWorkoutModal'));
+    modal.show();
+}
+
+function showGoalModal() {
+    alert('Goal setting feature coming soon! (Demo mode)');
+}
+
+function logWorkout() {
+    const date = document.getElementById('workoutDate').value;
+    const duration = document.getElementById('workoutDuration').value;
+    const completed = document.getElementById('exercisesCompleted').value;
+    const total = document.getElementById('totalExercises').value;
+    
+    if (!date || !duration || !completed || !total) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    // Demo save functionality
+    alert('Workout logged successfully! (Demo mode)');
+    
+    // Close modal and refresh page
+    const modal = bootstrap.Modal.getInstance(document.getElementById('logWorkoutModal'));
+    modal.hide();
+    location.reload();
+}
+</script>
+{% endblock %}

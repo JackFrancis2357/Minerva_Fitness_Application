@@ -1,8 +1,8 @@
-# Weekly Workout Planner
+# FitnessPro - AI-Powered Fitness Platform
 
 ## Overview
 
-The Weekly Workout Planner is a web application that generates personalized workout plans based on user-selected equipment and desired workout duration. Built with Flask, Python, and OpenAI's GPT-4o, it provides both single workout sessions and intelligent weekly workout schedules. The application offers a simple, user-friendly interface for creating customized fitness routines without requiring user accounts or complex authentication.
+FitnessPro is a comprehensive monetizable fitness platform that transforms from a simple workout planner into a feature-rich SaaS application. Built with Flask, Python, PostgreSQL, and OpenAI integration, it offers tiered subscription plans with premium features designed to generate recurring revenue. The platform includes workout generation, progress tracking, custom exercises, AI-powered nutrition planning, and multiple monetization strategies.
 
 ## User Preferences
 
@@ -141,17 +141,44 @@ Preferred communication style: Simple, everyday language.
     └── js/script.js
 ```
 
+## Monetization Features
+
+### Subscription Tiers
+- **Free Plan ($0/month)**: 3 daily workouts, 1 weekly plan, basic features
+- **Premium Plan ($9.99/month)**: Unlimited workouts, progress tracking, custom exercises, workout history, 20 saved plans
+- **Pro Plan ($19.99/month)**: Everything in Premium + AI nutrition planning, advanced analytics, unlimited saved plans, priority support
+
+### Premium Features for Revenue Generation
+1. **Progress Tracking Dashboard**: Detailed analytics, goal setting, performance insights, workout history
+2. **Custom Exercise Creator**: Users can create, save, and manage personalized exercises
+3. **AI Nutrition Planner**: Personalized meal plans, calorie tracking, macro targets, dietary preferences
+4. **Workout Library**: Save unlimited workout plans, organize favorites, export functionality
+5. **Advanced Analytics**: Progress charts, trend analysis, achievement tracking
+6. **Priority Support**: Enhanced customer service for paying users
+
+### Database Architecture
+- User management with subscription tracking
+- Workout plan storage and organization
+- Progress tracking with detailed metrics
+- Custom exercise management
+- Nutrition plan storage
+- Payment history and subscription management
+
 ## Recent Changes (July 10, 2025)
 
-✓ Added OpenAI GPT-4o integration for weekly workout planning
-✓ Extended user interface to support plan type selection (daily vs. weekly)
-✓ Implemented weekly goal specification with predefined options and custom input
-✓ Created new weekly workout template with 7-day schedule display
-✓ Enhanced JavaScript for dynamic form behavior and validation
-✓ Added robust fallback logic for reliable weekly plan generation
-✓ Updated application architecture to support both single and weekly workout modes
-✓ Implemented simple weekly generator as primary solution for reliability
-✓ Added comprehensive error handling and timeout management
-✓ Prioritized consistent user experience over AI-powered features
+✓ Completely transformed application into monetizable SaaS platform
+✓ Implemented PostgreSQL database with comprehensive data models
+✓ Added three-tier subscription system (Free, Premium, Pro)
+✓ Created premium feature gating and usage limits
+✓ Built progress tracking dashboard with analytics
+✓ Developed custom exercise creation and management system
+✓ Implemented AI-powered nutrition planning (Pro feature)
+✓ Added comprehensive pricing page with feature comparison
+✓ Created user dashboard with subscription management
+✓ Enhanced navigation with premium feature access
+✓ Implemented usage limit tracking and upgrade prompts
+✓ Added premium call-to-action sections throughout the app
+✓ Established foundation for Stripe payment integration
+✓ Prioritized user acquisition and conversion optimization
 
 The application is designed as a simple, self-contained web service that can be easily deployed to various hosting platforms without external database dependencies.

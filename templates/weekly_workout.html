@@ -68,32 +68,100 @@
                     } %}
                     
                     {% for day_name, day_data in weekly_plan.daily_workouts.items() %}
-                    <div class="col-lg-6 col-xl-4 mb-3">
-                        <div class="card h-100 {% if day_data.rest_day %}border-secondary{% else %}border-primary{% endif %}">
+                    <div class="col-12 mb-4">
+                        <div class="card {% if day_data.rest_day %}border-secondary{% else %}border-primary{% endif %}">
                             <div class="card-header {% if day_data.rest_day %}bg-secondary{% else %}bg-primary{% endif %} text-white">
-                                <h6 class="card-title mb-0">
-                                    <i class="{{ day_icons[day_name] }}"></i>
-                                    {{ day_name.title() }}
-                                </h6>
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <h5 class="card-title mb-0">
+                                            <i class="{{ day_icons[day_name] }}"></i>
+                                            {{ day_name.title() }} - {{ day_data.focus }}
+                                        </h5>
+                                    </div>
+                                    {% if not day_data.rest_day %}
+                                    <div class="col-auto">
+                                        <span class="badge bg-light text-dark">
+                                            <i class="bi bi-clock"></i>
+                                            {{ day_data.duration_minutes }} min
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </div>
                             <div class="card-body">
-                                <h6 class="text-primary">{{ day_data.focus }}</h6>
-                                <p class="small text-muted mb-2">{{ day_data.description }}</p>
+                                <p class="text-muted mb-3">{{ day_data.description }}</p>
+                                
                                 {% if not day_data.rest_day %}
-                                <div class="text-center">
-                                    <a href="{{ url_for('generate_workout') }}" class="btn btn-outline-primary btn-sm" 
-                                       onclick="event.preventDefault(); generateDayWorkout('{{ day_name }}', '{{ day_data.focus }}');">
-                                        <i class="bi bi-play-circle"></i>
-                                        Generate Today's Workout
-                                    </a>
-                                </div>
+                                    <!-- Warm-up Section -->
+                                    {% if day_data.warmup %}
+                                    <div class="mb-3">
+                                        <h6 class="text-success">
+                                            <i class="bi bi-thermometer-sun"></i>
+                                            Warm-up
+                                        </h6>
+                                        <p class="small text-muted mb-0">{{ day_data.warmup }}</p>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Exercises Section -->
+                                    {% if day_data.exercises %}
+                                    <div class="mb-3">
+                                        <h6 class="text-primary">
+                                            <i class="bi bi-list-check"></i>
+                                            Exercises
+                                        </h6>
+                                        <div class="row">
+                                            {% for exercise in day_data.exercises %}
+                                            <div class="col-md-6 col-lg-4 mb-3">
+                                                <div class="card border-light">
+                                                    <div class="card-body p-3">
+                                                        <h6 class="card-title">{{ exercise.name }}</h6>
+                                                        <div class="small text-muted mb-2">
+                                                            <strong>{{ exercise.sets }} sets</strong> × 
+                                                            <strong>{{ exercise.reps }} reps</strong>
+                                                        </div>
+                                                        <div class="small text-muted mb-2">
+                                                            <i class="bi bi-clock"></i>
+                                                            {{ exercise.rest_seconds }}s rest
+                                                        </div>
+                                                        {% if exercise.muscle_group %}
+                                                        <div class="small mb-2">
+                                                            <span class="badge bg-light text-dark">{{ exercise.muscle_group.title() }}</span>
+                                                        </div>
+                                                        {% endif %}
+                                                        {% if exercise.instructions %}
+                                                        <p class="small text-muted mb-0">{{ exercise.instructions }}</p>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Cool-down Section -->
+                                    {% if day_data.cooldown %}
+                                    <div class="mb-0">
+                                        <h6 class="text-info">
+                                            <i class="bi bi-snow"></i>
+                                            Cool-down
+                                        </h6>
+                                        <p class="small text-muted mb-0">{{ day_data.cooldown }}</p>
+                                    </div>
+                                    {% endif %}
+                                    
                                 {% else %}
-                                <div class="text-center">
-                                    <span class="badge bg-secondary">
-                                        <i class="bi bi-moon"></i>
-                                        Rest Day
-                                    </span>
-                                </div>
+                                    <!-- Rest Day Content -->
+                                    <div class="text-center py-3">
+                                        <i class="bi bi-moon text-secondary mb-3" style="font-size: 2rem;"></i>
+                                        <h6 class="text-secondary">Complete Rest Day</h6>
+                                        {% if day_data.recovery_activities %}
+                                        <p class="small text-muted">
+                                            Optional activities: {{ day_data.recovery_activities|join(', ') }}
+                                        </p>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
                             </div>
                         </div>
@@ -175,38 +243,33 @@
 </div>
 
 <script>
-function generateDayWorkout(day, focus) {
-    // Create a form to submit for a specific day's workout
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '{{ url_for("generate_workout") }}';
+// Add smooth scrolling for daily workout sections
+document.addEventListener('DOMContentLoaded', function() {
+    // Add print styles for better workout printing
+    const style = document.createElement('style');
+    style.textContent = `
+        @media print {
+            .btn, .alert { display: none !important; }
+            .card { break-inside: avoid; margin-bottom: 1rem; }
+            .card-header { background-color: #007bff !important; color: white !important; }
+        }
+    `;
+    document.head.appendChild(style);
     
-    // Add equipment
-    {% for eq in equipment %}
-    const equipmentInput{{ loop.index }} = document.createElement('input');
-    equipmentInput{{ loop.index }}.type = 'hidden';
-    equipmentInput{{ loop.index }}.name = 'equipment';
-    equipmentInput{{ loop.index }}.value = '{{ eq }}';
-    form.appendChild(equipmentInput{{ loop.index }});
-    {% endfor %}
-    
-    // Add duration
-    const durationInput = document.createElement('input');
-    durationInput.type = 'hidden';
-    durationInput.name = 'duration';
-    durationInput.value = '{{ duration }}';
-    form.appendChild(durationInput);
-    
-    // Add plan type
-    const planTypeInput = document.createElement('input');
-    planTypeInput.type = 'hidden';
-    planTypeInput.name = 'plan_type';
-    planTypeInput.value = 'daily';
-    form.appendChild(planTypeInput);
-    
-    // Submit form
-    document.body.appendChild(form);
-    form.submit();
-}
+    // Add collapse/expand functionality for each day
+    const dayCards = document.querySelectorAll('.card');
+    dayCards.forEach(card => {
+        const header = card.querySelector('.card-header');
+        if (header) {
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', function() {
+                const body = card.querySelector('.card-body');
+                if (body) {
+                    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+                }
+            });
+        }
+    });
+});
 </script>
 {% endblock %}

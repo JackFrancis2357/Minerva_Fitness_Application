@@ -18,15 +18,18 @@ def generate_weekly_workout_plan(equipment: List[str], daily_duration: int, week
     
     # Prepare exercise database summary for context
     exercise_summary = []
-    for exercise in exercises[:20]:  # Limit to first 20 exercises for context
+    for exercise in exercises[:30]:  # Include more exercises for better context
         exercise_summary.append({
             "name": exercise.get("name", ""),
             "type": exercise.get("type", ""),
             "muscle_group": exercise.get("muscle_group", ""),
-            "equipment_needed": exercise.get("equipment_needed", [])
+            "equipment_needed": exercise.get("equipment_needed", []),
+            "reps_per_set": exercise.get("reps_per_set", 10),
+            "sets": exercise.get("sets", 3),
+            "rest_between_sets_seconds": exercise.get("rest_between_sets_seconds", 60)
         })
     
-    prompt = f"""Create a balanced 7-day weekly workout plan with the following specifications:
+    prompt = f"""Create a comprehensive 7-day weekly workout plan with COMPLETE daily workout details:
 
 REQUIREMENTS:
 - Available Equipment: {equipment_str}
@@ -34,7 +37,7 @@ REQUIREMENTS:
 - Weekly Goal: {weekly_goal}
 - Use exercises from the provided database when possible
 
-AVAILABLE EXERCISES (sample):
+AVAILABLE EXERCISES:
 {json.dumps(exercise_summary, indent=2)}
 
 WEEKLY PLAN STRUCTURE:
@@ -47,9 +50,39 @@ Create a JSON response with exactly this structure:
         "monday": {{
             "focus": "primary muscle group or workout type",
             "description": "brief description of the day's workout",
-            "rest_day": false
+            "rest_day": false,
+            "exercises": [
+                {{
+                    "name": "Exercise name from database or similar",
+                    "sets": 3,
+                    "reps": "10-12",
+                    "rest_seconds": 60,
+                    "instructions": "Brief form instructions",
+                    "muscle_group": "target muscle"
+                }}
+            ],
+            "duration_minutes": {daily_duration},
+            "warmup": "5-minute warm-up description",
+            "cooldown": "5-minute cool-down description"
         }},
-        "tuesday": {{ ... }},
+        "tuesday": {{
+            "focus": "different muscle group",
+            "description": "brief description", 
+            "rest_day": false,
+            "exercises": [
+                {{
+                    "name": "Exercise name",
+                    "sets": 3,
+                    "reps": "8-10", 
+                    "rest_seconds": 90,
+                    "instructions": "Brief form instructions",
+                    "muscle_group": "target muscle"
+                }}
+            ],
+            "duration_minutes": {daily_duration},
+            "warmup": "warm-up description",
+            "cooldown": "cool-down description"
+        }},
         "wednesday": {{ ... }},
         "thursday": {{ ... }},
         "friday": {{ ... }},
@@ -57,7 +90,10 @@ Create a JSON response with exactly this structure:
         "sunday": {{
             "focus": "Rest and Recovery",
             "description": "Complete rest day for muscle recovery",
-            "rest_day": true
+            "rest_day": true,
+            "exercises": [],
+            "duration_minutes": 0,
+            "recovery_activities": ["light stretching", "walk", "meditation"]
         }}
     }},
     "weekly_tips": [
@@ -69,7 +105,11 @@ Create a JSON response with exactly this structure:
 
 GUIDELINES:
 - Include 1-2 rest days per week
+- Each workout day should have 4-8 exercises that fit the duration
 - Vary muscle groups and workout types across the week
+- Use exercises from the provided database when possible, or create similar ones
+- Include specific sets, reps, and rest periods for each exercise
+- Provide warm-up and cool-down for each workout day
 - Consider the weekly goal when planning intensity and focus
 - Keep daily sessions within the specified duration
 - Provide practical, actionable advice
@@ -108,13 +148,86 @@ GUIDELINES:
             "total_weekly_duration": daily_duration * 6,  # 6 workout days
             "plan_description": f"A balanced weekly plan focused on {weekly_goal.lower()} using {equipment_str}.",
             "daily_workouts": {
-                "monday": {"focus": "Upper Body", "description": "Focus on chest, shoulders, and arms", "rest_day": False},
-                "tuesday": {"focus": "Lower Body", "description": "Focus on legs and glutes", "rest_day": False},
-                "wednesday": {"focus": "Cardio", "description": "Cardiovascular endurance training", "rest_day": False},
-                "thursday": {"focus": "Upper Body", "description": "Focus on back and biceps", "rest_day": False},
-                "friday": {"focus": "Full Body", "description": "Complete body workout", "rest_day": False},
-                "saturday": {"focus": "Active Recovery", "description": "Light movement and stretching", "rest_day": False},
-                "sunday": {"focus": "Rest and Recovery", "description": "Complete rest day for muscle recovery", "rest_day": True}
+                "monday": {
+                    "focus": "Upper Body", 
+                    "description": "Focus on chest, shoulders, and arms", 
+                    "rest_day": False,
+                    "exercises": [
+                        {"name": "Push-ups", "sets": 3, "reps": "10-15", "rest_seconds": 60, "instructions": "Keep body straight", "muscle_group": "chest"},
+                        {"name": "Shoulder raises", "sets": 3, "reps": "12-15", "rest_seconds": 45, "instructions": "Control the movement", "muscle_group": "shoulders"}
+                    ],
+                    "duration_minutes": daily_duration,
+                    "warmup": "5 minutes of arm circles and light movement",
+                    "cooldown": "5 minutes of upper body stretching"
+                },
+                "tuesday": {
+                    "focus": "Lower Body", 
+                    "description": "Focus on legs and glutes", 
+                    "rest_day": False,
+                    "exercises": [
+                        {"name": "Squats", "sets": 3, "reps": "12-15", "rest_seconds": 90, "instructions": "Keep knees aligned", "muscle_group": "legs"},
+                        {"name": "Lunges", "sets": 3, "reps": "10 each leg", "rest_seconds": 60, "instructions": "Step forward and down", "muscle_group": "legs"}
+                    ],
+                    "duration_minutes": daily_duration,
+                    "warmup": "5 minutes of leg swings and marching",
+                    "cooldown": "5 minutes of leg stretching"
+                },
+                "wednesday": {
+                    "focus": "Cardio", 
+                    "description": "Cardiovascular endurance training", 
+                    "rest_day": False,
+                    "exercises": [
+                        {"name": "Jumping jacks", "sets": 3, "reps": "30 seconds", "rest_seconds": 30, "instructions": "Keep rhythm steady", "muscle_group": "full body"},
+                        {"name": "Mountain climbers", "sets": 3, "reps": "20 seconds", "rest_seconds": 40, "instructions": "Fast alternating legs", "muscle_group": "core"}
+                    ],
+                    "duration_minutes": daily_duration,
+                    "warmup": "5 minutes of light jogging in place",
+                    "cooldown": "5 minutes of walking and deep breathing"
+                },
+                "thursday": {
+                    "focus": "Upper Body", 
+                    "description": "Focus on back and biceps", 
+                    "rest_day": False,
+                    "exercises": [
+                        {"name": "Pull-ups or rows", "sets": 3, "reps": "8-12", "rest_seconds": 90, "instructions": "Pull with control", "muscle_group": "back"},
+                        {"name": "Planks", "sets": 3, "reps": "30 seconds", "rest_seconds": 60, "instructions": "Keep body straight", "muscle_group": "core"}
+                    ],
+                    "duration_minutes": daily_duration,
+                    "warmup": "5 minutes of arm and back movement",
+                    "cooldown": "5 minutes of upper body stretching"
+                },
+                "friday": {
+                    "focus": "Full Body", 
+                    "description": "Complete body workout", 
+                    "rest_day": False,
+                    "exercises": [
+                        {"name": "Burpees", "sets": 3, "reps": "8-10", "rest_seconds": 90, "instructions": "Full body movement", "muscle_group": "full body"},
+                        {"name": "Plank to push-up", "sets": 3, "reps": "5-8", "rest_seconds": 60, "instructions": "Smooth transition", "muscle_group": "full body"}
+                    ],
+                    "duration_minutes": daily_duration,
+                    "warmup": "5 minutes of full body movement",
+                    "cooldown": "5 minutes of full body stretching"
+                },
+                "saturday": {
+                    "focus": "Active Recovery", 
+                    "description": "Light movement and stretching", 
+                    "rest_day": False,
+                    "exercises": [
+                        {"name": "Gentle yoga flow", "sets": 1, "reps": "15 minutes", "rest_seconds": 0, "instructions": "Focus on breathing", "muscle_group": "flexibility"},
+                        {"name": "Walking", "sets": 1, "reps": "15 minutes", "rest_seconds": 0, "instructions": "Light pace", "muscle_group": "cardio"}
+                    ],
+                    "duration_minutes": daily_duration,
+                    "warmup": "Light movement and breathing",
+                    "cooldown": "Relaxation and stretching"
+                },
+                "sunday": {
+                    "focus": "Rest and Recovery", 
+                    "description": "Complete rest day for muscle recovery", 
+                    "rest_day": True,
+                    "exercises": [],
+                    "duration_minutes": 0,
+                    "recovery_activities": ["light stretching", "walk", "meditation"]
+                }
             },
             "weekly_tips": [
                 "Gradually increase intensity each week",

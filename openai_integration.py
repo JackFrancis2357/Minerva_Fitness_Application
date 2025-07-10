@@ -7,7 +7,10 @@ from typing import Dict, List, Any
 from openai import OpenAI
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+openai_client = OpenAI(
+    api_key=OPENAI_API_KEY,
+    timeout=30.0  # 30 second timeout to prevent long waits
+)
 
 
 def generate_weekly_workout_plan(equipment: List[str], daily_duration: int, weekly_goal: str, exercises: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -16,17 +19,14 @@ def generate_weekly_workout_plan(equipment: List[str], daily_duration: int, week
     # Prepare equipment list for the prompt
     equipment_str = ", ".join(equipment) if equipment else "bodyweight only"
     
-    # Prepare exercise database summary for context
+    # Prepare exercise database summary for context (limit to reduce prompt size)
     exercise_summary = []
-    for exercise in exercises[:30]:  # Include more exercises for better context
+    for exercise in exercises[:15]:  # Reduce to prevent timeout
         exercise_summary.append({
             "name": exercise.get("name", ""),
             "type": exercise.get("type", ""),
             "muscle_group": exercise.get("muscle_group", ""),
-            "equipment_needed": exercise.get("equipment_needed", []),
-            "reps_per_set": exercise.get("reps_per_set", 10),
-            "sets": exercise.get("sets", 3),
-            "rest_between_sets_seconds": exercise.get("rest_between_sets_seconds", 60)
+            "equipment_needed": exercise.get("equipment_needed", [])
         })
     
     prompt = f"""Create a comprehensive 7-day weekly workout plan with COMPLETE daily workout details:
@@ -117,6 +117,7 @@ GUIDELINES:
 """
 
     try:
+        # Try with shorter prompt first to reduce timeout risk
         response = openai_client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -129,7 +130,8 @@ GUIDELINES:
                 {"role": "user", "content": prompt}
             ],
             response_format={"type": "json_object"},
-            max_tokens=2000
+            max_tokens=2500,
+            temperature=0.7
         )
         
         result = json.loads(response.choices[0].message.content)
@@ -142,6 +144,10 @@ GUIDELINES:
         return result
         
     except Exception as e:
+        # Log the specific error for debugging
+        import logging
+        logging.error(f"OpenAI API error: {str(e)}")
+        
         # Fallback response if OpenAI fails
         return {
             "weekly_goal": weekly_goal,

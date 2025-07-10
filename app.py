@@ -3,6 +3,7 @@ import logging
 from flask import Flask, render_template, request, redirect, url_for, flash
 from workout_generator import WorkoutGenerator
 from openai_integration import generate_weekly_workout_plan, get_workout_goal_suggestions
+from simple_weekly_generator import generate_simple_weekly_plan
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -49,18 +50,38 @@ def generate_workout():
         
         if plan_type == 'weekly':
             # Generate weekly workout plan using GPT-4o
-            weekly_plan = generate_weekly_workout_plan(
-                equipment=equipment,
-                daily_duration=duration,
-                weekly_goal=weekly_goal,
-                exercises=workout_gen.exercises
-            )
-            
-            return render_template('weekly_workout.html',
-                                 weekly_plan=weekly_plan,
-                                 equipment=equipment,
-                                 duration=duration,
-                                 weekly_goal=weekly_goal)
+            try:
+                weekly_plan = generate_weekly_workout_plan(
+                    equipment=equipment,
+                    daily_duration=duration,
+                    weekly_goal=weekly_goal,
+                    exercises=workout_gen.exercises
+                )
+                
+                return render_template('weekly_workout.html',
+                                     weekly_plan=weekly_plan,
+                                     equipment=equipment,
+                                     duration=duration,
+                                     weekly_goal=weekly_goal)
+            except Exception as e:
+                logging.error(f"Weekly plan generation failed: {str(e)}")
+                # Try fallback simple generator
+                try:
+                    weekly_plan = generate_simple_weekly_plan(
+                        equipment=equipment,
+                        daily_duration=duration,
+                        weekly_goal=weekly_goal
+                    )
+                    flash('Using simplified weekly plan generator due to connectivity issues.', 'warning')
+                    return render_template('weekly_workout.html',
+                                         weekly_plan=weekly_plan,
+                                         equipment=equipment,
+                                         duration=duration,
+                                         weekly_goal=weekly_goal)
+                except Exception as fallback_error:
+                    logging.error(f"Fallback generator also failed: {str(fallback_error)}")
+                    flash('Unable to generate weekly plan right now. Please try again or create a single workout instead.', 'error')
+                    return redirect(url_for('index'))
         else:
             # Generate single workout plan (existing functionality)
             workout_plan = workout_gen.generate_workout(equipment, duration)

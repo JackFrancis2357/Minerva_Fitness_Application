@@ -2,6 +2,7 @@ import os
 import logging
 from flask import Flask, render_template, request, redirect, url_for, flash
 from workout_generator import WorkoutGenerator
+from openai_integration import generate_weekly_workout_plan, get_workout_goal_suggestions
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -15,7 +16,8 @@ workout_gen = WorkoutGenerator()
 @app.route('/')
 def index():
     """Render the main page with equipment selection and duration input."""
-    return render_template('index.html')
+    goal_suggestions = get_workout_goal_suggestions()
+    return render_template('index.html', goal_suggestions=goal_suggestions)
 
 @app.route('/workout', methods=['POST'])
 def generate_workout():
@@ -24,6 +26,13 @@ def generate_workout():
         # Get form data
         equipment = request.form.getlist('equipment')
         duration = request.form.get('duration', type=int)
+        plan_type = request.form.get('plan_type', 'daily')  # 'daily' or 'weekly'
+        weekly_goal = request.form.get('weekly_goal', '')
+        custom_goal = request.form.get('custom_weekly_goal', '')
+        
+        # Handle custom goal
+        if weekly_goal == 'custom' and custom_goal.strip():
+            weekly_goal = custom_goal.strip()
         
         # Validate inputs
         if not duration or duration < 15 or duration > 90:
@@ -34,17 +43,36 @@ def generate_workout():
             flash('Please select at least one equipment option.', 'error')
             return redirect(url_for('index'))
         
-        # Generate workout plan
-        workout_plan = workout_gen.generate_workout(equipment, duration)
-        
-        if not workout_plan['exercises']:
-            flash('No exercises found for the selected equipment. Please try different options.', 'error')
+        if plan_type == 'weekly' and not weekly_goal.strip():
+            flash('Please specify your weekly workout goal.', 'error')
             return redirect(url_for('index'))
         
-        return render_template('workout.html', 
-                             workout=workout_plan, 
-                             equipment=equipment, 
-                             duration=duration)
+        if plan_type == 'weekly':
+            # Generate weekly workout plan using GPT-4o
+            weekly_plan = generate_weekly_workout_plan(
+                equipment=equipment,
+                daily_duration=duration,
+                weekly_goal=weekly_goal,
+                exercises=workout_gen.exercises
+            )
+            
+            return render_template('weekly_workout.html',
+                                 weekly_plan=weekly_plan,
+                                 equipment=equipment,
+                                 duration=duration,
+                                 weekly_goal=weekly_goal)
+        else:
+            # Generate single workout plan (existing functionality)
+            workout_plan = workout_gen.generate_workout(equipment, duration)
+            
+            if not workout_plan['exercises']:
+                flash('No exercises found for the selected equipment. Please try different options.', 'error')
+                return redirect(url_for('index'))
+            
+            return render_template('workout.html', 
+                                 workout=workout_plan, 
+                                 equipment=equipment, 
+                                 duration=duration)
     
     except Exception as e:
         logging.error(f"Error generating workout: {str(e)}")

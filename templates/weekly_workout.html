@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Your Weekly Plan - Daily Workout Planner{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Weekly Plan Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-5">
+                <i class="bi bi-calendar-week text-orange"></i>
+                Your Weekly Workout Plan
+            </h1>
+            <p class="lead text-muted">
+                {{ weekly_plan.weekly_goal }} • {{ duration }} minutes per session
+            </p>
+        </div>
+
+        <!-- Plan Overview -->
+        <div class="card mb-4">
+            <div class="card-header bg-orange text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle"></i>
+                    Plan Overview
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="mb-2"><strong>Goal:</strong> {{ weekly_plan.weekly_goal }}</p>
+                        <p class="mb-2"><strong>Description:</strong> {{ weekly_plan.plan_description }}</p>
+                        <p class="mb-0"><strong>Equipment:</strong> {{ equipment|join(', ')|title }}</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="workout-stats">
+                            <div class="mb-2">
+                                <strong>{{ weekly_plan.total_weekly_duration }}</strong><br>
+                                <small class="text-muted">Total Minutes/Week</small>
+                            </div>
+                            <div>
+                                <strong>{{ duration }}</strong><br>
+                                <small class="text-muted">Minutes/Session</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Schedule -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-calendar3"></i>
+                    Weekly Schedule
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% set day_icons = {
+                        'monday': 'bi-calendar-day',
+                        'tuesday': 'bi-calendar-day',
+                        'wednesday': 'bi-calendar-day',
+                        'thursday': 'bi-calendar-day',
+                        'friday': 'bi-calendar-day',
+                        'saturday': 'bi-calendar-day',
+                        'sunday': 'bi-calendar-day'
+                    } %}
+                    
+                    {% for day_name, day_data in weekly_plan.daily_workouts.items() %}
+                    <div class="col-lg-6 col-xl-4 mb-3">
+                        <div class="card h-100 {% if day_data.rest_day %}border-secondary{% else %}border-primary{% endif %}">
+                            <div class="card-header {% if day_data.rest_day %}bg-secondary{% else %}bg-primary{% endif %} text-white">
+                                <h6 class="card-title mb-0">
+                                    <i class="{{ day_icons[day_name] }}"></i>
+                                    {{ day_name.title() }}
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="text-primary">{{ day_data.focus }}</h6>
+                                <p class="small text-muted mb-2">{{ day_data.description }}</p>
+                                {% if not day_data.rest_day %}
+                                <div class="text-center">
+                                    <a href="{{ url_for('generate_workout') }}" class="btn btn-outline-primary btn-sm" 
+                                       onclick="event.preventDefault(); generateDayWorkout('{{ day_name }}', '{{ day_data.focus }}');">
+                                        <i class="bi bi-play-circle"></i>
+                                        Generate Today's Workout
+                                    </a>
+                                </div>
+                                {% else %}
+                                <div class="text-center">
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-moon"></i>
+                                        Rest Day
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Tips -->
+        {% if weekly_plan.weekly_tips %}
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-lightbulb"></i>
+                    Weekly Success Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for tip in weekly_plan.weekly_tips %}
+                    <div class="col-md-4 mb-2">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-check-circle text-success me-2 mt-1"></i>
+                            <p class="small mb-0">{{ tip }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="text-center mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-orange btn-lg me-3">
+                <i class="bi bi-arrow-left"></i>
+                Create New Plan
+            </a>
+            <button type="button" class="btn btn-success btn-lg" onclick="window.print()">
+                <i class="bi bi-printer"></i>
+                Print Weekly Plan
+            </button>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="card mt-4">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Important Notes
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-thermometer-half"></i> Warm Up</h6>
+                        <p class="small text-muted">Always start with 5-10 minutes of light cardio before each workout.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-droplet"></i> Hydration</h6>
+                        <p class="small text-muted">Drink water throughout your workouts and maintain hydration daily.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-heart-pulse"></i> Listen to Your Body</h6>
+                        <p class="small text-muted">Adjust intensity based on how you feel. Rest if you experience pain.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if weekly_plan.error %}
+        <div class="alert alert-warning mt-3">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Note:</strong> This plan was generated using fallback logic. {{ weekly_plan.error }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function generateDayWorkout(day, focus) {
+    // Create a form to submit for a specific day's workout
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("generate_workout") }}';
+    
+    // Add equipment
+    {% for eq in equipment %}
+    const equipmentInput{{ loop.index }} = document.createElement('input');
+    equipmentInput{{ loop.index }}.type = 'hidden';
+    equipmentInput{{ loop.index }}.name = 'equipment';
+    equipmentInput{{ loop.index }}.value = '{{ eq }}';
+    form.appendChild(equipmentInput{{ loop.index }});
+    {% endfor %}
+    
+    // Add duration
+    const durationInput = document.createElement('input');
+    durationInput.type = 'hidden';
+    durationInput.name = 'duration';
+    durationInput.value = '{{ duration }}';
+    form.appendChild(durationInput);
+    
+    // Add plan type
+    const planTypeInput = document.createElement('input');
+    planTypeInput.type = 'hidden';
+    planTypeInput.name = 'plan_type';
+    planTypeInput.value = 'daily';
+    form.appendChild(planTypeInput);
+    
+    // Submit form
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+{% endblock %}

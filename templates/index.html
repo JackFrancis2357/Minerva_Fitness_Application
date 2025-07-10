@@ -12,7 +12,7 @@
                 Daily Workout Planner
             </h1>
             <p class="lead text-muted">
-                Create personalized workout plans based on your available equipment and desired duration
+                Create personalized workout plans or AI-powered weekly schedules based on your equipment and goals
             </p>
         </div>
 
@@ -98,13 +98,66 @@
                         </div>
                     </div>
 
+                    <!-- Plan Type Selection -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar"></i>
+                            Plan Type
+                        </label>
+                        <p class="text-muted small">Choose between a single workout or a weekly plan</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="plan_type" value="daily" id="plan_daily" checked>
+                                    <label class="form-check-label" for="plan_daily">
+                                        <i class="bi bi-play-circle"></i>
+                                        Single Workout
+                                    </label>
+                                    <small class="d-block text-muted">Generate one workout session</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="plan_type" value="weekly" id="plan_weekly">
+                                    <label class="form-check-label" for="plan_weekly">
+                                        <i class="bi bi-calendar-week"></i>
+                                        Weekly Plan
+                                    </label>
+                                    <small class="d-block text-muted">AI-generated 7-day plan</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Goal Selection (hidden by default) -->
+                    <div class="mb-4" id="weeklyGoalSection" style="display: none;">
+                        <label for="weekly_goal" class="form-label fw-bold">
+                            <i class="bi bi-target"></i>
+                            Weekly Goal
+                        </label>
+                        <p class="text-muted small">What do you want to achieve with your weekly workout plan?</p>
+                        
+                        <select class="form-select" name="weekly_goal" id="weekly_goal">
+                            <option value="">Select your goal...</option>
+                            {% for goal in goal_suggestions %}
+                            <option value="{{ goal }}">{{ goal }}</option>
+                            {% endfor %}
+                            <option value="custom">Custom goal (type below)</option>
+                        </select>
+                        
+                        <div class="mt-2" id="customGoalInput" style="display: none;">
+                            <input type="text" class="form-control" placeholder="Describe your custom fitness goal..." id="custom_goal_text" name="custom_weekly_goal">
+                        </div>
+                    </div>
+
                     <!-- Duration Selection -->
                     <div class="mb-4">
                         <label for="duration" class="form-label fw-bold">
                             <i class="bi bi-clock"></i>
-                            Workout Duration
+                            <span id="durationLabel">Workout Duration</span>
                         </label>
-                        <p class="text-muted small">Choose your desired workout length (15-90 minutes)</p>
+                        <p class="text-muted small" id="durationDescription">Choose your desired workout length (15-90 minutes)</p>
                         
                         <div class="row align-items-center">
                             <div class="col-md-8">
@@ -125,9 +178,9 @@
 
                     <!-- Submit Button -->
                     <div class="text-center">
-                        <button type="submit" class="btn btn-orange btn-lg">
+                        <button type="submit" class="btn btn-orange btn-lg" id="generateButton">
                             <i class="bi bi-play-circle"></i>
-                            Generate My Workout
+                            <span id="buttonText">Generate My Workout</span>
                         </button>
                     </div>
                 </form>

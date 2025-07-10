@@ -1,8 +1,8 @@
-# Daily Workout Planner
+# Weekly Workout Planner
 
 ## Overview
 
-The Daily Workout Planner is a web application that generates personalized workout plans based on user-selected equipment and desired workout duration. Built with Flask and Python, it provides a simple, user-friendly interface for creating customized fitness routines without requiring user accounts or complex authentication.
+The Weekly Workout Planner is a web application that generates personalized workout plans based on user-selected equipment and desired workout duration. Built with Flask, Python, and OpenAI's GPT-4o, it provides both single workout sessions and intelligent weekly workout schedules. The application offers a simple, user-friendly interface for creating customized fitness routines without requiring user accounts or complex authentication.
 
 ## User Preferences
 
@@ -32,9 +32,10 @@ Preferred communication style: Simple, everyday language.
 ### 1. Flask Application (`app.py`)
 - **Purpose**: Main application entry point and route handling
 - **Key Routes**:
-  - `/` - Renders equipment selection and duration input form
-  - `/workout` - Processes form data and generates workout plan
+  - `/` - Renders equipment selection, duration input, and plan type selection form
+  - `/workout` - Processes form data and generates either single workout or weekly plan
 - **Error Handling**: Form validation with user feedback via Flask flash messages
+- **New Features**: Plan type selection (daily/weekly), weekly goal specification
 
 ### 2. Workout Generator (`workout_generator.py`)
 - **Purpose**: Core business logic for workout generation
@@ -57,18 +58,41 @@ Preferred communication style: Simple, everyday language.
 - **Index Template**: Equipment selection form with checkboxes and duration slider
 - **Workout Template**: Generated workout plan display with exercise details
 
-### 5. Static Assets
+### 5. OpenAI Integration (`openai_integration.py`)
+- **Purpose**: GPT-4o integration for intelligent weekly workout planning
+- **Key Features**:
+  - Weekly plan generation based on goals and equipment
+  - Structured 7-day workout schedules
+  - Personalized fitness recommendations
+- **Fallback Logic**: Provides basic weekly structure if OpenAI fails
+
+### 6. Static Assets
 - **CSS**: Custom styling complementing Bootstrap theme
-- **JavaScript**: Form validation, slider synchronization, and UI enhancements
+- **JavaScript**: Form validation, slider synchronization, plan type selection, and UI enhancements
+
+### 7. Template System
+- **Base Template**: Common layout with Bootstrap navigation and flash message handling
+- **Index Template**: Equipment selection form with plan type and weekly goal options
+- **Workout Template**: Generated single workout plan display with exercise details
+- **Weekly Workout Template**: AI-generated weekly schedule with daily workout summaries
 
 ## Data Flow
 
-1. **User Input**: User selects equipment and duration via web form
+### Single Workout Generation
+1. **User Input**: User selects equipment, duration, and "Single Workout" plan type
 2. **Form Submission**: POST request to `/workout` endpoint
 3. **Validation**: Server validates equipment selection and duration range (15-90 minutes)
 4. **Exercise Filtering**: WorkoutGenerator filters exercises based on available equipment
 5. **Workout Generation**: Algorithm selects and organizes exercises to fit target duration
 6. **Response**: Rendered workout plan page with exercise details and timing
+
+### Weekly Plan Generation
+1. **User Input**: User selects equipment, duration, "Weekly Plan" type, and fitness goal
+2. **Form Submission**: POST request to `/workout` endpoint with weekly parameters
+3. **Validation**: Server validates all inputs including weekly goal specification
+4. **OpenAI Integration**: GPT-4o generates intelligent 7-day workout schedule
+5. **Plan Structure**: AI creates balanced weekly routine with rest days and progression
+6. **Response**: Rendered weekly workout plan page with daily summaries and tips
 
 ## External Dependencies
 
@@ -79,10 +103,12 @@ Preferred communication style: Simple, everyday language.
 
 ### Backend Dependencies
 - **Flask**: Web framework
+- **OpenAI**: GPT-4o integration for weekly plan generation
 - **Python Standard Library**: JSON handling, logging, random selection
 
 ### Environment Configuration
 - **SESSION_SECRET**: Environment variable for Flask session security
+- **OPENAI_API_KEY**: OpenAI API key for GPT-4o weekly plan generation
 - **Development Mode**: Debug mode enabled for development environment
 
 ## Deployment Strategy
@@ -100,17 +126,29 @@ Preferred communication style: Simple, everyday language.
 
 ### File Structure
 ```
-├── app.py                 # Main Flask application
-├── main.py               # Application entry point
-├── workout_generator.py  # Business logic
-├── exercises.json        # Exercise database
-├── templates/            # Jinja2 templates
+├── app.py                    # Main Flask application
+├── main.py                  # Application entry point
+├── workout_generator.py     # Single workout business logic
+├── openai_integration.py    # GPT-4o weekly plan generation
+├── exercises.json          # Exercise database
+├── templates/              # Jinja2 templates
 │   ├── base.html
 │   ├── index.html
-│   └── workout.html
-└── static/              # Static assets
+│   ├── workout.html
+│   └── weekly_workout.html
+└── static/                # Static assets
     ├── css/style.css
     └── js/script.js
 ```
+
+## Recent Changes (July 10, 2025)
+
+✓ Added OpenAI GPT-4o integration for weekly workout planning
+✓ Extended user interface to support plan type selection (daily vs. weekly)
+✓ Implemented weekly goal specification with predefined options and custom input
+✓ Created new weekly workout template with 7-day schedule display
+✓ Enhanced JavaScript for dynamic form behavior and validation
+✓ Added fallback logic for reliable weekly plan generation
+✓ Updated application architecture to support both single and weekly workout modes
 
 The application is designed as a simple, self-contained web service that can be easily deployed to various hosting platforms without external database dependencies.

@@ -12,6 +12,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize print functionality
     initializePrintButton();
+    
+    // Initialize plan type selection
+    initializePlanTypeSelection();
+    
+    // Initialize weekly goal selection
+    initializeWeeklyGoalSelection();
 });
 
 /**
@@ -62,6 +68,9 @@ function initializeFormValidation() {
         workoutForm.addEventListener('submit', function(e) {
             const equipmentChecked = document.querySelectorAll('input[name="equipment"]:checked');
             const durationValue = document.getElementById('durationSlider').value;
+            const planType = document.querySelector('input[name="plan_type"]:checked')?.value;
+            const weeklyGoalSelect = document.getElementById('weekly_goal');
+            const customGoalText = document.getElementById('custom_goal_text');
             
             // Check if at least one equipment is selected
             if (equipmentChecked.length === 0) {
@@ -77,11 +86,33 @@ function initializeFormValidation() {
                 return false;
             }
             
+            // Check weekly plan requirements
+            if (planType === 'weekly') {
+                let goalValue = weeklyGoalSelect?.value || '';
+                
+                if (goalValue === 'custom') {
+                    const customValue = customGoalText?.value?.trim() || '';
+                    if (!customValue) {
+                        e.preventDefault();
+                        showAlert('Please describe your custom fitness goal.', 'error');
+                        return false;
+                    }
+                } else if (!goalValue) {
+                    e.preventDefault();
+                    showAlert('Please select your weekly workout goal.', 'error');
+                    return false;
+                }
+            }
+            
             // Show loading state
             const submitButton = this.querySelector('button[type="submit"]');
             if (submitButton) {
                 submitButton.disabled = true;
-                submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating Workout...';
+                if (planType === 'weekly') {
+                    submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating Weekly Plan...';
+                } else {
+                    submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating Workout...';
+                }
             }
             
             return true;
@@ -265,6 +296,72 @@ function loadUserPreferences() {
             }
         } catch (e) {
             console.log('Error loading preferences:', e);
+        }
+    }
+}
+
+/**
+ * Initialize plan type selection logic
+ */
+function initializePlanTypeSelection() {
+    const dailyRadio = document.getElementById('plan_daily');
+    const weeklyRadio = document.getElementById('plan_weekly');
+    const weeklyGoalSection = document.getElementById('weeklyGoalSection');
+    const durationLabel = document.getElementById('durationLabel');
+    const durationDescription = document.getElementById('durationDescription');
+    const buttonText = document.getElementById('buttonText');
+    
+    if (dailyRadio && weeklyRadio && weeklyGoalSection) {
+        // Handle plan type changes
+        function updatePlanType() {
+            if (weeklyRadio.checked) {
+                weeklyGoalSection.style.display = 'block';
+                if (durationLabel) durationLabel.textContent = 'Daily Session Duration';
+                if (durationDescription) durationDescription.textContent = 'Duration for each workout day (15-90 minutes)';
+                if (buttonText) buttonText.textContent = 'Generate Weekly Plan';
+            } else {
+                weeklyGoalSection.style.display = 'none';
+                if (durationLabel) durationLabel.textContent = 'Workout Duration';
+                if (durationDescription) durationDescription.textContent = 'Choose your desired workout length (15-90 minutes)';
+                if (buttonText) buttonText.textContent = 'Generate My Workout';
+            }
+        }
+        
+        dailyRadio.addEventListener('change', updatePlanType);
+        weeklyRadio.addEventListener('change', updatePlanType);
+        
+        // Initial state
+        updatePlanType();
+    }
+}
+
+/**
+ * Initialize weekly goal selection logic
+ */
+function initializeWeeklyGoalSelection() {
+    const weeklyGoalSelect = document.getElementById('weekly_goal');
+    const customGoalInput = document.getElementById('customGoalInput');
+    const customGoalText = document.getElementById('custom_goal_text');
+    
+    if (weeklyGoalSelect && customGoalInput) {
+        weeklyGoalSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customGoalInput.style.display = 'block';
+                if (customGoalText) {
+                    customGoalText.focus();
+                }
+            } else {
+                customGoalInput.style.display = 'none';
+            }
+        });
+        
+        // Update the hidden input with custom goal when needed
+        if (customGoalText) {
+            customGoalText.addEventListener('input', function() {
+                if (weeklyGoalSelect.value === 'custom') {
+                    weeklyGoalSelect.setAttribute('data-custom-value', this.value);
+                }
+            });
         }
     }
 }

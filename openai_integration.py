@@ -9,7 +9,7 @@ from openai import OpenAI
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 openai_client = OpenAI(
     api_key=OPENAI_API_KEY,
-    timeout=30.0  # 30 second timeout to prevent long waits
+    timeout=10.0  # Much shorter timeout - 10 seconds max
 )
 
 

@@ -233,10 +233,10 @@
             </div>
         </div>
 
-        {% if weekly_plan.error %}
-        <div class="alert alert-warning mt-3">
-            <i class="bi bi-exclamation-triangle"></i>
-            <strong>Note:</strong> This plan was generated using fallback logic. {{ weekly_plan.error }}
+        {% if weekly_plan.fallback_used %}
+        <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle"></i>
+            <strong>Note:</strong> This plan was generated using our reliable workout algorithm to ensure fast performance and availability.
         </div>
         {% endif %}
     </div>

@@ -1,5 +1,14 @@
 /* Custom styles for Daily Workout Planner */
 
+/* Orange color theme override */
+:root {
+    --orange-primary: #ff6b35;
+    --orange-primary-rgb: 255, 107, 53;
+    --orange-secondary: #ff8c42;
+    --orange-light: #ffab73;
+    --orange-dark: #e5522e;
+}
+
 /* Base styling */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -31,8 +40,8 @@ body {
 
 /* Form styling */
 .form-check-input:checked {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
+    background-color: var(--orange-primary);
+    border-color: var(--orange-primary);
 }
 
 .form-check-label {
@@ -46,11 +55,11 @@ body {
 
 /* Range slider */
 .form-range::-webkit-slider-thumb {
-    background-color: var(--bs-primary);
+    background-color: var(--orange-primary);
 }
 
 .form-range::-moz-range-thumb {
-    background-color: var(--bs-primary);
+    background-color: var(--orange-primary);
     border: none;
 }
 
@@ -72,7 +81,7 @@ body {
 
 .workout-stats strong {
     font-size: 1.1rem;
-    color: var(--bs-primary);
+    color: var(--orange-primary);
 }
 
 /* Badges */
@@ -144,12 +153,12 @@ body {
 
 /* Focus states */
 .form-check-input:focus {
-    border-color: var(--bs-primary);
-    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+    border-color: var(--orange-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--orange-primary-rgb), 0.25);
 }
 
 .btn:focus {
-    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(var(--orange-primary-rgb), 0.25);
 }
 
 /* Loading state */
@@ -165,6 +174,43 @@ body {
 
 .bg-success {
     background-color: var(--bs-success) !important;
+}
+
+/* Orange theme classes */
+.bg-orange {
+    background-color: var(--orange-primary) !important;
+}
+
+.text-orange {
+    color: var(--orange-primary) !important;
+}
+
+.btn-orange {
+    background-color: var(--orange-primary);
+    border-color: var(--orange-primary);
+    color: white;
+}
+
+.btn-orange:hover {
+    background-color: var(--orange-dark);
+    border-color: var(--orange-dark);
+    color: white;
+}
+
+.btn-outline-orange {
+    color: var(--orange-primary);
+    border-color: var(--orange-primary);
+}
+
+.btn-outline-orange:hover {
+    background-color: var(--orange-primary);
+    border-color: var(--orange-primary);
+    color: white;
+}
+
+.badge-orange {
+    background-color: var(--orange-primary) !important;
+    color: white !important;
 }
 
 /* Alert customizations */

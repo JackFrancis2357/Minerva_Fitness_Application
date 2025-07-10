@@ -8,7 +8,7 @@
         <!-- Workout Header -->
         <div class="text-center mb-4">
             <h1 class="display-5">
-                <i class="bi bi-fire text-primary"></i>
+                <i class="bi bi-fire text-orange"></i>
                 Your {{ workout.target_duration_minutes }}-Minute Workout
             </h1>
             <p class="lead text-muted">
@@ -18,7 +18,7 @@
 
         <!-- Workout Summary -->
         <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-orange text-white">
                 <h5 class="card-title mb-0">
                     <i class="bi bi-info-circle"></i>
                     Workout Summary
@@ -62,11 +62,11 @@
                     <div class="p-4 border-bottom {% if loop.last %}border-0{% endif %}">
                         <div class="row align-items-center">
                             <div class="col-md-1 text-center">
-                                <span class="badge bg-primary rounded-pill fs-6">{{ loop.index }}</span>
+                                <span class="badge bg-orange rounded-pill fs-6">{{ loop.index }}</span>
                             </div>
                             <div class="col-md-8">
                                 <h6 class="mb-2">
-                                    <i class="bi bi-play-circle text-primary"></i>
+                                    <i class="bi bi-play-circle text-orange"></i>
                                     {{ exercise.name }}
                                 </h6>
                                 <p class="text-muted mb-2">{{ exercise.description }}</p>
@@ -107,7 +107,7 @@
 
         <!-- Action Buttons -->
         <div class="text-center mt-4">
-            <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-lg me-3">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-orange btn-lg me-3">
                 <i class="bi bi-arrow-left"></i>
                 Start Over
             </a>

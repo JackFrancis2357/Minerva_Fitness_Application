@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Your Workout Plan - Daily Workout Planner{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Workout Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-5">
+                <i class="bi bi-fire text-primary"></i>
+                Your {{ workout.target_duration_minutes }}-Minute Workout
+            </h1>
+            <p class="lead text-muted">
+                {{ workout.exercise_count }} exercises • {{ workout.total_duration_minutes }} minutes total
+            </p>
+        </div>
+
+        <!-- Workout Summary -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle"></i>
+                    Workout Summary
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Equipment Used:</strong>
+                        <ul class="list-unstyled mt-2">
+                            {% for eq in equipment %}
+                                <li>
+                                    <i class="bi bi-check-circle text-success"></i>
+                                    {{ eq.replace('_', ' ').title() }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Duration:</strong>
+                        <p class="mt-2 mb-0">{{ workout.total_duration_minutes }} minutes</p>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Exercises:</strong>
+                        <p class="mt-2 mb-0">{{ workout.exercise_count }} total</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercise List -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-list-ol"></i>
+                    Exercise Routine
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% for exercise in workout.exercises %}
+                    <div class="p-4 border-bottom {% if loop.last %}border-0{% endif %}">
+                        <div class="row align-items-center">
+                            <div class="col-md-1 text-center">
+                                <span class="badge bg-primary rounded-pill fs-6">{{ loop.index }}</span>
+                            </div>
+                            <div class="col-md-8">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-play-circle text-primary"></i>
+                                    {{ exercise.name }}
+                                </h6>
+                                <p class="text-muted mb-2">{{ exercise.description }}</p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-secondary">{{ exercise.type.title() }}</span>
+                                    <span class="badge bg-info">{{ exercise.muscle_group.replace('_', ' ').title() }}</span>
+                                    {% if exercise.equipment_needed %}
+                                        {% for eq in exercise.equipment_needed %}
+                                            <span class="badge bg-warning">{{ eq.replace('_', ' ').title() }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="badge bg-success">Bodyweight</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <div class="workout-stats">
+                                    <div class="mb-2">
+                                        <strong>{{ exercise.sets }} sets</strong>
+                                    </div>
+                                    <div class="mb-2">
+                                        {% if exercise.reps_per_set == 1 and exercise.duration_per_rep_seconds >= 10 %}
+                                            <span class="text-muted">{{ exercise.duration_per_rep_seconds }}s hold</span>
+                                        {% else %}
+                                            <span class="text-muted">{{ exercise.reps_per_set }} reps</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-muted small">
+                                        Rest: {{ exercise.rest_between_sets_seconds }}s
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-lg me-3">
+                <i class="bi bi-arrow-left"></i>
+                Start Over
+            </a>
+            <button type="button" class="btn btn-success btn-lg" onclick="window.print()">
+                <i class="bi bi-printer"></i>
+                Print Workout
+            </button>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-lightbulb"></i>
+                    Workout Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-thermometer-half"></i> Warm Up</h6>
+                        <p class="small text-muted">Always start with 5-10 minutes of light cardio to prepare your body.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-droplet"></i> Stay Hydrated</h6>
+                        <p class="small text-muted">Drink water throughout your workout to maintain performance.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-heart-pulse"></i> Listen to Your Body</h6>
+                        <p class="small text-muted">Rest when needed and don't push through pain.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

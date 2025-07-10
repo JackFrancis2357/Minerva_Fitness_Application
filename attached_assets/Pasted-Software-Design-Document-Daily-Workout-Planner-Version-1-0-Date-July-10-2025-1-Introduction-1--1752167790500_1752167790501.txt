@@ -1,0 +1,190 @@
+Software Design Document: Daily Workout Planner
+Version 1.0
+
+Date: July 10, 2025
+
+1. Introduction
+1.1 Purpose
+
+This document outlines the software design for a Daily Workout Planner application. The primary purpose of this application is to provide users with customized workout plans based on their available equipment and desired workout duration. This document is intended for the development team to guide the implementation of the application.
+
+1.2 Scope
+
+The initial version of this application will focus on the core functionality of generating a daily workout. Key features include:
+
+Allowing users to specify the equipment they have available.
+
+Allowing users to input their desired workout duration.
+
+Generating a dynamic workout plan based on user inputs.
+
+Displaying the workout plan in a clear and easy-to-follow format.
+
+Features explicitly out of scope for version 1.0 include:
+
+User authentication and user accounts.
+
+Saving workout history.
+
+Social sharing features.
+
+Progress tracking.
+
+Paid features or subscriptions.
+
+1.3 Objectives
+
+To develop a simple, user-friendly web application.
+
+To provide value to users by creating effective, customized workout routines.
+
+To build a solid foundation for potential future enhancements.
+
+To utilize a Python Flask backend for its simplicity and flexibility.
+
+2. System Architecture
+The application will be a monolithic web application built using the Flask web framework for Python. The architecture is chosen for its simplicity and rapid development capabilities, which are ideal for this initial version.
+
+Frontend: The frontend will be rendered using standard HTML, CSS, and JavaScript. It will communicate with the backend via standard HTTP requests. We will not use a complex JavaScript framework for V1.0 to maintain simplicity.
+
+Backend: The backend will be a Flask application responsible for business logic, including workout generation and serving web pages.
+
+Data Storage: For V1.0, the exercise data will be stored in a simple data structure within the application, such as a JSON file or a Python dictionary. This avoids the complexity of setting up and managing a database for the initial release.
+
+3. Data Model
+3.1 Exercise Data Structure
+
+The core of the application is the list of available exercises. Each exercise will be represented as a dictionary with the following fields:
+
+{
+  "id": 1,
+  "name": "Push-up",
+  "type": "strength",
+  "muscle_group": "chest",
+  "equipment_needed": [],
+  "duration_per_rep_seconds": 3,
+  "reps_per_set": 10,
+  "sets": 3,
+  "rest_between_sets_seconds": 60
+}
+
+id: A unique identifier for the exercise.
+
+name: The name of the exercise.
+
+type: The type of exercise (e.g., 'strength', 'cardio', 'flexibility').
+
+muscle_group: The primary muscle group targeted (e.g., 'chest', 'back', 'legs', 'full_body').
+
+equipment_needed: A list of equipment required for the exercise (e.g., ["dumbbell", "bench"]). An empty list signifies a bodyweight exercise.
+
+duration_per_rep_seconds: An estimate of how long a single repetition takes.
+
+reps_per_set: The recommended number of repetitions per set.
+
+sets: The recommended number of sets.
+
+rest_between_sets_seconds: The recommended rest time between sets.
+
+3.2 User Input
+
+The user will provide the following inputs on the main page:
+
+available_equipment: A list of strings representing the equipment the user has (e.g., ["dumbbell", "kettlebell", "pull-up_bar"]).
+
+desired_duration_minutes: An integer representing the total desired workout time in minutes.
+
+3.3 Workout Plan Structure
+
+The generated workout plan will be a list of exercise objects, ordered sequentially.
+
+4. API Endpoints
+The application will be simple and may not require a formal REST API for V1.0, as the primary interaction will be through form submissions that render new pages. However, we will structure the backend logic around the concept of endpoints.
+
+4.1 GET /
+
+Description: Renders the main page of the application.
+
+Request Body: None.
+
+Response: An HTML page containing the form for user inputs (equipment and duration).
+
+4.2 POST /workout
+
+Description: Generates and displays a new workout plan based on user input.
+
+Request Body (Form Data):
+
+equipment: A list of selected equipment.
+
+duration: The desired workout duration in minutes.
+
+Logic:
+
+Filter the master list of exercises to include only those that can be performed with the user's available_equipment.
+
+Implement a workout generation algorithm to select a series of exercises that fits within the desired_duration_minutes. The algorithm will aim to create a balanced workout targeting different muscle groups.
+
+The total time for an exercise is calculated as (duration_per_rep_seconds * reps_per_set * sets) + (rest_between_sets_seconds * (sets - 1)).
+
+The algorithm will iteratively add exercises to the plan until the total estimated time is close to the user's desired duration.
+
+Response: An HTML page displaying the generated workout plan.
+
+5. User Interface (UI) and User Experience (UX)
+The UI will be clean, simple, and focused on the core task.
+
+Home Page (/):
+
+A welcoming headline.
+
+A multi-select checklist for available equipment. Options will include "Bodyweight Only", "Dumbbells", "Kettlebells", "Resistance Bands", "Pull-up Bar", "Bench", etc.
+
+An input field (slider or number input) for the desired workout duration (e.g., 15 to 90 minutes).
+
+A prominent "Generate Workout" button.
+
+Workout Page (/workout):
+
+A summary of the generated workout (e.g., "Your 30-Minute Full Body Workout").
+
+A list of exercises. Each item in the list will clearly state:
+
+Exercise Name
+
+Sets and Reps (e.g., "3 sets of 10 reps")
+
+Rest time between sets.
+
+A "Start Over" button to return to the home page.
+
+6. Deployment and Scalability
+6.1 Deployment
+
+The application will be designed to be easily deployable.
+
+Server: It can be deployed on any server that supports Python WSGI applications, such as Gunicorn or uWSGI.
+
+Platform: Suitable for deployment on platforms like Heroku, AWS Elastic Beanstalk, or a simple VPS.
+
+Dependencies: A requirements.txt file will list all Python dependencies (e.g., Flask).
+
+6.2 Scalability
+
+While V1.0 is not designed for high scalability, the architecture allows for future growth:
+
+Database: The initial data storage can be migrated from a JSON file to a relational database (like PostgreSQL) or a NoSQL database (like MongoDB) to handle a larger set of exercises and user data.
+
+Caching: A caching layer (like Redis) can be introduced to cache generated workout plans for common input combinations.
+
+Microservices: If the application grows in complexity, the monolithic architecture can be broken down into microservices (e.g., a separate service for workout generation).
+
+7. Future Considerations
+Exercise Variety: Expanding the exercise database significantly.
+
+Workout Algorithms: Improving the workout generation algorithm to account for user fitness level, goals (e.g., muscle gain, fat loss), and muscle group splits (e.g., push/pull/legs).
+
+User Profiles: Adding user authentication to save preferences, equipment, and track workout history.
+
+Visuals: Including images or short videos demonstrating each exercise.
+
